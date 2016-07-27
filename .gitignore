@@ -1,0 +1,4 @@
+# 注释
+.idea
+*.pyc
+dist/
