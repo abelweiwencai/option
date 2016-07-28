@@ -11,9 +11,12 @@ date:20160727
 '''
 # 内置模块
 import math
+import time
 from math import log,sqrt,exp
 # 第三方模块
-import numpy
+import numpy as np
+import scipy
+from scipy.stats import norm
 # 自己写的模块
 '''
 关于这样的简单欧式期权的定价，有经典的Black - Scholes[1]公式：
@@ -30,14 +33,64 @@ class optionDemo(object):
         self.r = 0.05  # 无风险利率
         self.vol = 0.25  # 波动率
 
+        self.portfolioSize = range(1, 10000, 500)
+        self.timeSpend = []
 
-    def calcOption(self):
-        pass
+
+    def calcCallOptionPricer(self,spot, strike, maturity, r, vol):
+        '''计算期权价格'''
+        try:
+            d1 = (log(spot/strike) + (r + 0.5 * vol * vol) * maturity)/vol/sqrt(maturity)
+            d2 = d1 - vol * sqrt(maturity)
+            price = spot * norm.cdf(d1) - strike * exp(-r * maturity) * norm.cdf(d2)
+            return price
+        except Exception,errMsg:
+            print "计算期权价格出错", errMsg
+            return False
+
+    def quiklyCalc(self):
+        '''利用numpy 提高计算速度'''
+        try:
+
+            for size in self.portfolioSize:
+                now = time.time()
+                # print "now:", now
+                strikes = np.linspace(2.0, 3.0, size)
+                # print "size:", size
+                for i in range(size):
+                    res = self.calcCallOptionPricer(self.spot, strikes[i], self.maturity, self.r, self.vol)
+
+                self.timeSpend.append(time.time() - now)
+        except Exception,errMsg:
+            print "Error: %s" % (errMsg.message)
+            return False
+
+    def lineGriphic(self):
+        from matplotlib import pylab
+        import seaborn as sns
+        font.set(15)
+        sns.set(style="ticks")
+        pylab.figure(figsize=(12,8))
+        pylab.bar(self.portfolioSize, self.timeSpend, color="r", width=300)
+        pylab.grid(True)
+        pylab.title("期权计算耗时（单位：秒）", fontproperties=font,fontsize=18)
+        pylab.ylabel("时间（s）", fontproperties=font,fontsize=15)
+        pylab.xlabel("组合数量）", fontproperties=font, fontsize=15)
+
+
+
 
 
 
 
 def main():
+    od = optionDemo()
+    optionPrice = od.calcCallOptionPricer(od.spot, od.strike, od.maturity, od.r, od.vol)
+    print "期权价格为：%.4f" % (optionPrice)
+    od.quiklyCalc()
+    # print "期权价格为：%2f" % 12365.456877
+    # print "期权价格为：%.2f" % 12365.456877
+    # print "期权价格为：%3f" % 12365.456877
     pass
 
 
