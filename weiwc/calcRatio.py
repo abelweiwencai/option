@@ -68,8 +68,10 @@ class optionDemo(object):
     def lineGriphic(self):
         from matplotlib import pylab
         import seaborn as sns
-        font.set(15)
+        # pylab.size(15)
+        # font = pylab.size(15) #set_size(15)
         sns.set(style="ticks")
+        font = self.timeSpend
         pylab.figure(figsize=(12,8))
         pylab.bar(self.portfolioSize, self.timeSpend, color="r", width=300)
         pylab.grid(True)
@@ -87,7 +89,9 @@ def main():
     od = optionDemo()
     optionPrice = od.calcCallOptionPricer(od.spot, od.strike, od.maturity, od.r, od.vol)
     print "期权价格为：%.4f" % (optionPrice)
-    od.quiklyCalc()
+    # od.quiklyCalc()
+    od.lineGriphic()
+
     # print "期权价格为：%2f" % 12365.456877
     # print "期权价格为：%.2f" % 12365.456877
     # print "期权价格为：%3f" % 12365.456877
